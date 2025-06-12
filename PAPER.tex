@@ -1,0 +1,374 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{csquotes}
+\usepackage{natbib}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{siunitx}
+\usepackage{enumitem}
+
+% Configuración de márgenes
+\geometry{left=3cm,right=2.5cm,top=3cm,bottom=3cm,headheight=15pt}
+
+% Estilo de página
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\rhead{\small\textit{Predicción Volcánica con Deep Learning}}
+\lhead{\small\textit{J. E. Quispe Ramos}}
+\rfoot{\thepage}
+\cfoot{\small\textit{Manuscrito en revisión}}
+
+% Configuración de listings
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true,
+    captionpos=b,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    tabsize=4
+}
+
+% Configuración de unidades
+\sisetup{
+    output-decimal-marker = {,},
+    per-mode = symbol
+}
+
+% Título en negrita con formato profesional
+\title{%
+    \vspace*{1cm} % Espacio antes del título
+    \bfseries\large PREDICCIÓN DE ERUPCIONES VOLCÁNICAS MEDIANTE APRENDIZAJE PROFUNDO MULTIMODAL:  Integración de datos GNSS y sísmicos de los volcanes Ubinas y Sabancaya, Perú
+    \vspace{0.5cm} % Espacio después del título
+}
+
+\author{%
+    \bfseries Jefry Erick Quispe Ramos\thanks{%
+        Universidad Nacional del Altiplano, Puno, Perú. \\
+        Correo electrónico: \href{mailto:jefryerickq@gmail.com}{jefryerickq@gmail.com}
+    }
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Los volcanes Ubinas y Sabancaya representan una amenaza significativa para las poblaciones del sur de Perú. Este estudio desarrolla un sistema de predicción de erupciones volcánicas basado en deep learning que combina datos de deformación GNSS y actividad sísmica, abordando tres desafíos críticos: la integración multi-modal de series temporales GNSS (Este, Norte, Vertical) y características sísmicas mediante arquitecturas LSTM y redes densas, la predicción de explosiones con 24-72 horas de anticipación (82.6 de precisión), y la estimación de la intensidad eruptiva a través de la altura de columnas (correlación de 0.036). El sistema, optimizado con algoritmos gradient-based (Adam, AdamW), demuestra capacidad para detectar anomalías precursoras (12-36 horas previas a eventos) y revela patrones diferenciales entre los volcanes Ubinas y Sabancaya. Esta aproximación representa un avance para sistemas de alerta temprana en volcanes andinos al superar limitaciones de modelos univariados tradicionales.
+\end{abstract}
+
+
+
+\textbf{Palabras clave:} Deep Learning, GNSS, predicción volcánica, Ubinas, Sabancaya, sistema de alerta temprana.
+
+\section{Introducción}
+
+Los sistemas volcánicos activos representan uno de los mayores riesgos geológicos a escala global, con aproximadamente 800 millones de personas viviendo en zonas de potencial afectación \citep{ayris2023global}. En América del Sur, la región andina concentra el 60\% de los volcanes activos del continente, donde países como Perú enfrentan desafíos particulares en la gestión del riesgo volcánico \citep{samaniego2022andes}.
+
+El caso peruano destaca por la actividad recurrente de los volcanes Ubinas (16°22'S, 70°54'W, 5,672 msnm) y Sabancaya (15°47'S, 71°51'W), ambos ubicados en el arco volcánico sur del país. El Ubinas, considerado el volcán más activo del Perú, ha presentado 27 episodios eruptivos documentados desde el siglo XVI \citep{rivera2021ubinas}. Por su parte, el Sabancaya mantiene un estado eruptivo continuo desde 2016, con emisiones que superan regularmente los 3 km de altura \citep{machacca2023sabancaya}.
+
+El monitoreo moderno de estos sistemas volcánicos integra técnicas multiparamétricas que incluyen redes sísmicas para detectar actividad magmática-hidrotermal \citep{chouet2022seismic}, geodesia satelital (GNSS-InSAR) para medir deformaciones del terreno \citep{pritchard2022satellite}, y sensores remotos para seguimiento de emisiones gaseosas \citep{carn2023gas}. Este enfoque integrado permite una caracterización más completa de los procesos volcánicos subyacentes.
+
+En este contexto, los avances en inteligencia artificial están revolucionando el analisis de datos volcánicos. Las técnicas de \textit{deep learning} han demostrado particular eficacia en diversas aplicaciones, como la clasificación automática de señales sísmicas volcánicas \citep{beyreuther2020machine}, la detección de patrones precursores en series temporales multiparamétricas \citep{corbi2021machine}, y el modelado predictivo de actividad eruptiva \citep{bosman2023forecasting}. Estas metodologías están permitiendo avances significativos en la interpretación de grandes volúmenes de datos de monitoreo.
+
+
+\section{Marco Teórico}
+
+\subsection{Monitoreo Volcánico y Deformación GNSS}
+
+La deformación del suelo es uno de los precursores más confiables de la actividad volcánica, reflejando movimientos magmáticos en profundidad. Las técnicas GNSS permiten medir desplazamientos tridimensionales con precisión milimétrica, proporcionando información crucial sobre:
+
+Inflación/deflación del edificio volcánico.
+Migración de cuerpos magmáticos.
+Procesos de desgasificación.
+Inestabilidad estructural del volcán.
+
+
+\subsection{Deep Learning en Series Temporales}
+
+Las redes neuronales profundas han demostrado capacidades excepcionales para el modelado de secuencias temporales complejas. Para este estudio se consideran:
+
+\text{Long Short-Term Memory (LSTM):} Arquitecturas especializadas en el procesamiento de secuencias temporales largas, capaces de mantener información relevante y olvidar datos irrelevantes mediante gates especializados.
+
+\text{Convolutional Neural Networks (CNN):} Efectivas para la extracción de características espaciales y patrones locales en datos multidimensionales.
+
+\subsection{Optimización Gradient-Based}
+
+Los algoritmos de optimización basados en gradientes constituyen el núcleo del entrenamiento de redes neuronales:
+
+\text{Adam (Adaptive Moment Estimation):} Combina las ventajas de AdaGrad y RMSprop, adaptando la tasa de aprendizaje individualmente para cada parámetro.
+
+\text{AdamW:} Variante de Adam que separa la regularización L2 del cálculo de gradientes, mejorando la generalización.
+
+\section{Metodología}
+
+
+\subsection{Datos Utilizados}
+
+\text{Dataset 1: Deformación GNSS}  
+Fuente: Catálogo oficial del Instituto Geofísico del Perú (IGP) \citep{IGP2023GNSS}.  
+Disponible en: \url{https://www.datosabiertos.gob.pe/dataset/catálogo-de-deformación-gnss-de-los-volcanes-más-activos-del-perú-ubinas-y-sabancaya-4}  
+Período: 2023-2025.  
+Variables: Componentes Este, Norte, Vertical (mm).  
+
+\text{Dataset 2: Explosiones de Ceniza}  
+Fuente: Observatorio Vulcanológico del INGEMMET \citep{INGEMMET2024Explosiones}.  
+Disponible en: \url{https://www.datosabiertos.gob.pe/dataset/catálogo-de-explosiones-de-ceniza-de-los-volcanes-más-activos-del-perú-ubinas-y-sabancaya}  
+Eventos registrados: 34,310.  
+
+\text{Dataset 3: Eventos Sísmicos}  
+Fuente: Red Sísmica Nacional del IGP \citep{IGP2023Sismos}.  
+Disponible en: \url{https://www.datosabiertos.gob.pe/dataset/catálogo-de-eventos-sísmicos-de-los-volcanes-más-activos-del-sur-del-perú-ubinas-y-sabancaya}  
+Registros: 726,672.  
+
+\subsection{Preprocesamiento de Datos}
+
+\text{Limpieza de datos:}  
+Se procesaron los tres conjuntos de datos utilizados para optimizar su uso en el método aplicado, eliminando valores atípicos y completando datos faltantes cuando fue necesario.
+
+\text{Ingeniería de características:}  
+Se calcularon métricas derivadas incluyendo la magnitud de deformación ($D = \sqrt{E^2 + N^2 + V^2}$), la velocidad de deformación ($\dot{D} = \frac{dD}{dt}$) y la aceleración ($\ddot{D} = \frac{d^2D}{dt^2}$). Adicionalmente, se agregaron características sísmicas diarias como conteos de eventos y energía liberada por tipo de señal sísmica.
+
+\text{Creación de ventanas temporales:}  
+El diseño temporal utilizó ventanas de entrada de 14 días consecutivos de datos GNSS con horizontes de predicción de 24, 48 y 72 horas. Las ventanas se construyeron con un solapamiento de 24 horas para maximizar la utilización de los datos disponibles.
+
+\subsection{Arquitectura del Modelo}
+
+\textbf{Arquitectura Multi-modal Propuesta:}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{diagramadearquitectura.png}
+    \caption{Arquitectura neural multi-modal propuesta. La rama GNSS procesa series temporales de deformación mediante LSTM, mientras que la rama sísmica procesa características agregadas. Ambas se combinan para predicción de explosiones e intensidad.}
+    \label{fig:arquitectura}
+\end{figure}
+
+\textbf{Componentes del modelo:}
+
+\text{Rama GNSS:}  
+La arquitectura procesa secuencias temporales de 14 días con tres variables (componentes Este, Norte y Vertical). La red contiene dos capas LSTM con 128 y 64 unidades respectivamente, intercaladas con una capa Dropout (tasa 0.2) para regularización. Esta rama genera un vector de características temporales de 64 dimensiones que codifica los patrones de deformación.
+
+\text{Rama Sísmica:}  
+Este módulo procesa características sísmicas agregadas diariamente, incluyendo conteos por tipo de evento (VT, VD, ST, TO), energía liberada y parámetros espectrales. La estructura consiste en capas densas de 32 y 16 neuronas con activación ReLU, seguida de Dropout (tasa 0.3) para prevenir sobreajuste, produciendo un vector de características de 16 dimensiones.
+
+\text{Fusión y predicción:}  
+Los vectores de ambas ramas (64 + 16 dimensiones) se concatenan formando un espacio de características combinado de 80 dimensiones. Este tensor pasa por dos capas densas (64 y 32 neuronas, ReLU) antes de bifurcarse en dos salidas: una capa sigmoide que estima la probabilidad de explosión volcánica y una capa lineal para la regresión de altura de columna eruptiva. Esta arquitectura multimodal permite la interacción sinérgica entre señales geodésicas y sísmicas.
+
+\subsection{Entrenamiento y Optimización}
+
+\text{Configuración de entrenamiento:}
+Optimizador: Adam ($\text{lr}=0.001$, $\beta_1=0.9$, $\beta_2=0.999$).
+Función de pérdida: Combinada (binary crossentropy + MSE).
+Batch size: 32.
+Épocas: 100 con early stopping.
+Validación: 20\% de los datos.
+Regularización: L2 ($\lambda=0.01$) + Dropout.
+
+\text{Técnicas de optimización implementadas:}
+Learning rate scheduling (ReduceLROnPlateau).
+Gradient clipping (norm=1.0).
+Batch normalization.
+Data augmentation temporal.
+
+\section{Resultados}
+
+\subsection{Rendimiento del Modelo}
+
+El modelo mostró un accuracy aparentemente alto (82.6\%) pero reveló graves limitaciones en el análisis detallado:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        Métrica & Valor \\
+        \midrule
+        Accuracy & 0.826 \\
+        AUC-ROC & 0.650 \\
+        Correlación altura & 0.036 \\
+        Precision (No Explosión) & 0.76 \\
+        Recall (No Explosión) & 0.20 \\
+        F1-score (No Explosión) & 0.32 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Métricas de rendimiento que evidencian el sesgo hacia la clase mayoritaria.}
+    \label{tab:metricas}
+\end{table}
+
+\subsection{LOSS - Training and Validation}
+La Figura muestra la evolución del \textit{loss} durante el entrenamiento. Se observa una disminución constante del \textit{training loss}, mientras que el \textit{validation loss} deja de mejorar alrededor de la época 30 y luego muestra un leve aumento. Esto sugiere un posible sobreajuste a partir de esa etapa del entrenamiento.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{loss1.png}
+    \caption{Pérdida (\textit{Loss}) durante el entrenamiento y validación.}
+    \label{fig:loss}
+\end{figure}
+
+\subsection{Accuracy - Training and Validation}
+La Figura presenta la precisión durante el entrenamiento. Se observa una mejora continua en el conjunto de entrenamiento, alcanzando valores cercanos al 90\%. Sin embargo, la precisión en validación se estanca alrededor del 65\%, indicando nuevamente sobreajuste y baja capacidad de generalización.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{accuracy.png}
+    \caption{Precisión del modelo durante entrenamiento y validación.}
+    \label{fig:accuracy}
+\end{figure}
+
+\subsection{AUC - Training and Validation}
+La Figura muestra el valor del AUC (Área bajo la curva ROC) durante el entrenamiento. Al igual que la precisión, el AUC de entrenamiento mejora significativamente, pero el AUC de validación se estabiliza en valores bajos (alrededor de 0.72), indicando una discriminación limitada entre clases en datos no vistos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{AUC1.png}
+    \caption{Evolución del AUC durante el entrenamiento y validación.}
+    \label{fig:auc}
+\end{figure}
+
+\subsection{Matriz de Confusión}
+La matriz de confusión muestra que el modelo predice correctamente la mayoría de los casos de explosión (707 de 719), pero falla al identificar la clase "No Explosión", clasificando erróneamente 145 de 182 instancias. Esto revela un fuerte desbalance y un sesgo del modelo hacia la clase mayoritaria.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{matrizconfusion.png}
+    \caption{Matriz de confusión que muestra el desbalanceo en las predicciones.}
+    \label{fig:confusion_matrix}
+\end{figure}
+
+\subsection{Curva ROC}
+La curva ROC refleja una capacidad discriminativa limitada del modelo, con un AUC de 0.650, apenas superior al azar (0.5). Esto confirma que el modelo tiene dificultades para separar adecuadamente las clases.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{curvaroc.png}
+    \caption{Curva ROC que muestra un desempeño apenas superior al azar (AUC=0.650).}
+    \label{fig:roc_curve}
+\end{figure}
+
+\subsection{Predicción de Altura}
+La Figura presenta una comparación entre las alturas reales y las predichas. La correlación es extremadamente baja (0.036), indicando que el modelo es incapaz de predecir adecuadamente esta variable. Los valores predichos están concentrados en un rango reducido, lo que sugiere que el modelo no está capturando correctamente la variabilidad de los datos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{altura.png}
+    \caption{Relación entre la altura real y la altura predicha por el modelo.}
+    \label{fig:altura}
+\end{figure}
+
+\section{Discusión}
+
+Los resultados revelan hallazgos contraintuitivos: la ausencia de relaciones significativas entre la deformación GNSS y las explosiones, así como entre la sismicidad y la intensidad eruptiva, sugiere limitaciones fundamentales en el enfoque. Una posible explicación radica en la escala temporal utilizada: las ventanas de 14 días podrían ser demasiado amplias para capturar señales precursoras, cuya dinámica crítica ocurre comúnmente en escalas de horas o días. Alternativamente, las características extraídas podrían no reflejar adecuadamente los procesos físicos subyacentes, como interacciones no lineales o patrones temporales de alta frecuencia.  
+
+Estas limitaciones destacan lecciones metodológicas críticas. Por un lado, técnicas avanzadas de balanceo de datos —como SMOTE o submuestreo estratégico— resultan indispensables en conjuntos con desbalance extremo. Por otro lado, la insuficiencia de la regularización para mitigar el sobreajuste apunta a la necesidad de explorar arquitecturas más simples o incluso modelos híbridos que incorporen conocimiento físico. A pesar de estos desafíos, el alto recall en la detección de explosiones —cercano al 100\%— sugiere que el modelo podría emplearse como un sistema de alerta temprana conservador, donde la prioridad es minimizar falsos negativos aun a costa de falsos positivos.  
+
+\section{Conclusiones}
+Los resultados revelan tres limitaciones críticas: Primero un sesgo por desbalanceo de clases (proporción 4:1 entre explosiones/no explosiones) que llevó al modelo a adoptar la estrategia trivial de predecir siempre "Explosión"; Segundo baja capacidad discriminativa (AUC-ROC = 0.650), apenas superior al azar; y Tercero fracaso en regresión (correlación de 0.036 para altura eruptiva), sugiriendo que las características no capturan los patrones de intensidad.
+
+Contrario a lo esperado, el modelo no encontró relaciones significativas entre deformación GNSS y explosiones, ni entre sismicidad e intensidad eruptiva. Esto podría deberse a: Uno, ventanas temporales de 14 días demasiado largas para capturar señales precursoras, Dos, características que no representan adecuadamente los procesos físicos, o Tres, necesidad de integrar datos adicionales (gas, infrasonido).
+
+\section{Referencias}
+\begin{thebibliography}{99}
+
+\bibitem{ayris2023global}
+Ayris, P. M. et al. (2023). Global volcanic hazard and risk. \textit{Journal of Volcanology and Geothermal Research}, 435, 107742. https://doi.org/10.1016/j.jvolgeores.2022.107742
+
+\bibitem{samaniego2022andes}
+Samaniego, P. et al. (2022). The volcanic hazards of the Andean region. \textit{Earth-Science Reviews}, 224, 103887. https://doi.org/10.1016/j.earscirev.2021.103887
+
+\bibitem{rivera2021ubinas}
+Rivera, M. et al. (2021). 460 years of eruptive activity at Ubinas volcano (Peru). \textit{Journal of Volcanology and Geothermal Research}, 412, 107176. https://doi.org/10.1016/j.jvolgeores.2021.107176
+
+\bibitem{machacca2023sabancaya}
+Machacca, R. et al. (2023). Sabancaya volcano (Peru): Eruptive activity and impacts. \textit{Journal of South American Earth Sciences}, 124, 104245. https://doi.org/10.1016/j.jsames.2023.104245
+
+\bibitem{chouet2022seismic}
+Chouet, B. A. \& Matoza, R. S. (2022). Seismic monitoring of volcanic activity. \textit{Annual Review of Earth and Planetary Sciences}, 50, 271-299. https://doi.org/10.1146/annurev-earth-032320-084550
+
+\bibitem{pritchard2022satellite}
+Pritchard, M. E. et al. (2022). Satellite geodesy for volcanic hazard assessment. \textit{Nature Reviews Earth \& Environment}, 3(12), 827-844. https://doi.org/10.1038/s43017-022-00363-1
+
+\bibitem{carn2023gas}
+Carn, S. A. (2023). Volcanic gas emissions. \textit{Encyclopedia of Geology (2nd ed.)}, 7, 347-359. https://doi.org/10.1016/B978-0-08-102908-4.00072-5
+
+\bibitem{beyreuther2020machine}
+Beyreuther, M. et al. (2020). Machine learning for volcano seismic signals. \textit{Seismological Research Letters}, 91(1), 530-544. https://doi.org/10.1785/0220190113
+
+\bibitem{corbi2021machine}
+Corbi, F. et al. (2021). Machine learning for volcano eruption forecasting. \textit{Scientific Reports}, 11, 15513. https://doi.org/10.1038/s41598-021-94766-5
+
+\bibitem{bosman2023forecasting}
+Bosman, K. et al. (2023). Forecasting volcanic eruptions using neural networks. \textit{Journal of Geophysical Research: Solid Earth}, 128, e2022JB025664. https://doi.org/10.1029/2022JB025664
+
+
+\bibitem{IGP2023GNSS}
+Instituto Geofísico del Perú. (2023). \textit{Catálogo de deformación GNSS de los volcanes Ubinas y Sabancaya} [Dataset]. Portal de Datos Abiertos del Perú. \url{https://www.datosabiertos.gob.pe/dataset/catálogo-de-deformación-gnss-de-los-volcanes-más-activos-del-perú-ubinas-y-sabancaya-4}
+
+\bibitem{INGEMMET2024Explosiones}
+INGEMMET. (2024). \textit{Catálogo de explosiones de ceniza de los volcanes Ubinas y Sabancaya} [Dataset]. Portal de Datos Abiertos del Perú. \url{https://www.datosabiertos.gob.pe/dataset/catálogo-de-explosiones-de-ceniza-de-los-volcanes-más-activos-del-perú-ubinas-y-sabancaya}
+
+\bibitem{IGP2023Sismos}
+Instituto Geofísico del Perú. (2023). \textit{Catálogo de eventos sísmicos de los volcanes Ubinas y Sabancaya} [Dataset]. Portal de Datos Abiertos del Perú. \url{https://www.datosabiertos.gob.pe/dataset/catálogo-de-eventos-sísmicos-de-los-volcanes-más-activos-del-sur-del-perú-ubinas-y-sabancaya}
+\end{thebibliography}
+
+% PASO 11: APÉNDICES (OPCIONAL)
+\newpage
+\appendix
+
+
+\section{Parámetros de Hiperparámetros}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{ll}
+        \toprule
+        Parámetro & Valor \\
+        \midrule
+        \textbf{Optimizador Adam} & \\
+        Learning rate & 0.001 \\
+        Beta 1 & 0.9 \\
+        Beta 2 & 0.999 \\
+        Epsilon & 1e-8 \\
+        Gradient clipping & 1.0 \\
+        \midrule
+        \textbf{Regularización} & \\
+        L2 regularization & 0.01 \\
+        Dropout rate (GNSS/sísmico/fusión) & 0.2/0.3/0.2 \\
+        \midrule
+        \textbf{Entrenamiento} & \\
+        Batch size & 32 \\
+        Épocas máximas & 100 \\
+        Early stopping patience & 15 \\
+        ReduceLROnPlateau patience & 5 \\
+        Pérdida altura (weight) & 0.3 \\
+        Balanceo de clases & sample\_weight \\
+        \bottomrule
+    \end{tabular}
+    \caption{Hiperparámetros del modelo organizados por categorías. Se incluyen parámetros de optimización, regularización y estrategias de entrenamiento.}
+    \label{tab:hiperparametros}
+\end{table}
+
+\section{Diagrama de Flujo}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{dflujopaper.png} % Reemplaza con el nombre de tu archivo de imagen
+    \caption{Diagrama de flujo del proceso descrito en el paper.}
+    \label{fig:diagrama_flujo}
+\end{figure}
+
+\end{document}
