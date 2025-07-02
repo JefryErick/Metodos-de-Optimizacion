@@ -1,12 +1,14 @@
-tensorflow>=2.10
-pandas
-numpy
-scikit-learn
-matplotlib
-seaborn
+INSTALAR:
+- tensorflow>=2.10
+- pandas
+- numpy
+- scikit-learn
+- matplotlib
+- seaborn
 
 
 
 PROCESO: 
 Trabajar con los datasets "clean", ya que estos ya pasaron por la limpieza.
-Llamar bien a los 3 datasets en el "codigoentrenamiento.py"
+Llamar bien a los 3 datasets en el "codigoentrenamiento.py" y ejecutar el código.
+También hay otro código para trabajarlo con datos simulados para mayor rapidez.
