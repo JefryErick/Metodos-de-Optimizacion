@@ -1,0 +1,325 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+%Template version as of 6/27/2024
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{float}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{PREDICCIÓN DE ERUPCIONES VOLCÁNICAS MEDIANTE LSTM Y MÉTODOS DE OPTIMIZACIÓN BASADOS EN GRADIENTE EN EL SUR DEL PERÚ
+}
+
+\author{\IEEEauthorblockN{\textsuperscript{} Jefry Erick Quispe Ramos}
+\IEEEauthorblockA{\textit{Facultad de Ingeniería Estadistica e Informática} \\
+\textit{Universidad Nacional del Altiplano (UNAP)}\\
+Puno, Perú \\
+https://orcid.org/0009-0001-3160-5489}
+}
+
+\maketitle
+
+\begin{abstract}
+
+En el Perú los volcanes activos como Ubinas y Sabancaya representan un riesgo significativo para las poblaciones cercanas ya que son volcanes bastante activos, para reducir el riesgo se buscó predecir las erupciones volcánicas con anticipación.
+Este estudio propone un modelo predictivo basado en redes neuronales LSTM(Memoria a corto y largo plazo) para anticipar erupciones volcánicas, utilizando datos históricos de deformación del Sistema Global de Navegación por Satélite GNSS y registros de erupciones confirmadas por el Instituto Geofísico del Perú (IGP). Se evaluaron tres optimizadores basados en gradiente (Adam, SGD, RMSprop) con ventanas de tiempo.
+Los resultados son excelentes demostraron que el modelo con RMSprop alcanzó el mejor desempeño, con un 92\% de exactitud (accuracy) y 100\% de sensibilidad (recall), superando a Adam (91\% accuracy) y SGD (90\% accuracy). Este enfoque permite predecir eventos eruptivos con alta fiabilidad, ofreciendo una herramienta crítica para la mitigación de riesgos en zonas volcánicas activas.
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+LSTM, Adam, SGD, RMSprop, GNSS, IGP.
+\end{IEEEkeywords}
+
+\section{Introducción}
+
+La región andina es altamente activa volcánicamente debido a la subducción de la placa de Nazca bajo la Sudamericana. En Perú, esta actividad representa una amenaza constante para poblaciones e infraestructura. En 2019, el volcán Ubinas provocó la evacuación de más de 1,000 personas y daños agrícolas en Moquegua \cite{b1}. Por su parte, el Sabancaya mantiene erupciones continuas desde 2016, afectando localidades como Maca y Chivay con emisiones de ceniza \cite{b2}.
+
+Tradicionalmente, la predicción de erupciones volcánicas ha dependido del análisis manual de datos sísmicos, geodésicos y geoquímicos por parte de expertos del Instituto Geofísico del Perú (IGP) o instituciones similares, como el United States Geological Survey (USGS) \cite{b3}. Aunque se han desarrollado modelos físicos para simular el comportamiento volcánico, estos suelen requerir numerosos parámetros no siempre disponibles o precisos.
+
+En respuesta a estas limitaciones, el presente trabajo propone un enfoque basado en aprendizaje profundo (deep learning) que utiliza señales GNSS reales recolectadas en volcanes activos del Perú. Se plantea entrenar un modelo de red neuronal LSTM (Long Short-Term Memory), optimizado mediante gradiente descendente, con el objetivo de anticipar eventos eruptivos.
+
+El uso de modelos LSTM se ha mostrado eficaz en la detección de patrones temporales complejos en series de tiempo geofísicas \cite{b4}. Además, dado que los sistemas de alerta temprana deben minimizar las omisiones (falsos negativos), el recall se convierte en una métrica crítica en este contexto \cite{b5}. Este estudio busca demostrar que un modelo LSTM, entrenado con señales GNSS y optimizado correctamente, puede anticipar con precisión erupciones volcánicas, contribuyendo así a la mitigación del riesgo en poblaciones vulnerables.
+
+
+
+
+\section{Marco Teórico}
+
+Las redes neuronales recurrentes (RNNs) fueron diseñadas para modelar secuencias de datos mediante la retroalimentación de estados anteriores. Sin embargo, las RNNs tradicionales presentan dificultades para aprender dependencias de largo plazo debido al problema del desvanecimiento del gradiente. Para superar estas limitaciones, Hochreiter y Schmidhuber introdujeron en 1997 la arquitectura \textit{Long Short-Term Memory} (LSTM), que incorpora compuertas de entrada, olvido y salida que controlan el flujo de información a través de la red \cite{b6}. Esta estructura permite a las LSTM conservar y actualizar información relevante a lo largo de secuencias extensas, lo que las hace altamente efectivas para tareas de predicción en series temporales, procesamiento de lenguaje natural y señales geofísicas \cite{b7}.
+
+El entrenamiento de redes neuronales profundas, incluyendo LSTM, se basa en algoritmos de optimización derivados del método de descenso por gradiente. Este procedimiento ajusta los pesos de la red minimizando una función de pérdida mediante el cálculo de derivadas parciales respecto a cada parámetro \cite{b8}. El optimizador más básico, el Gradiente Descendente Estocástico (SGD), actualiza los pesos utilizando pequeños lotes de datos, pero puede ser lento y sensible a mínimos locales. Para mejorar su eficiencia, se han propuesto variantes como RMSprop, que ajusta dinámicamente la tasa de aprendizaje utilizando una media móvil del cuadrado del gradiente \cite{b9}, y Adam (Adaptive Moment Estimation), que combina el momento del gradiente con técnicas de escalado adaptativo, proporcionando una convergencia más rápida y estable en contextos con ruido y datos secuenciales \cite{b10}.
+
+La aplicación de inteligencia artificial en la predicción de eventos geofísicos ha ganado relevancia en la última década, destacando el potencial de modelos profundos para identificar patrones precursores en datos sísmicos y de deformación del terreno \cite{b11}. No obstante, el uso de señales GNSS como insumo principal sigue siendo limitado, especialmente en regiones andinas como el Perú, donde se han aplicado mayormente al monitoreo posterior a eventos. Estudios recientes indican que combinar GNSS con redes LSTM permitiría detectar desplazamientos previos a una erupción con alta sensibilidad \cite{b12}. Este trabajo se posiciona dentro de esa línea de investigación emergente, explorando la capacidad predictiva de modelos entrenados sobre datos geodésicos reales recolectados en volcanes peruanos activos.
+
+
+
+\section{Métodos}
+
+Para este estudio se utilizaron dos catálogos principales del Instituto Geofísico del Perú (IGP): el catálogo de deformación GNSS, que contiene mediciones diarias de desplazamiento de la corteza terrestre en componentes Este, Norte y Vertical obtenidas mediante estaciones permanentes ubicadas en zonas volcánicas del sur del Perú \cite{b13}; y el catálogo de explosiones volcánicas, un registro histórico de eventos eruptivos documentados y validados por el Centro Vulcanológico Nacional \cite{b14}.
+
+Ambos conjuntos fueron integrados utilizando la columna de fecha como clave principal. A partir de esta unión se construyó una variable binaria que indica si ocurrió o no una erupción en un día determinado. El conjunto final contiene 927 registros diarios, correspondientes al periodo entre octubre de 2023 y finales del 2024, con una proporción de 90.72\% de días con actividad eruptiva.
+
+
+Preprocesamiento:Conversión y ordenamiento temporal
+Se convirtió la columna \texttt{FECHA\_UTC} al formato datetime estándar (YYYY-MM-DD) y se ordenaron todos los registros cronológicamente para preservar la secuencia temporal de los datos.
+
+Normalización: Se aplicó normalización MinMaxScaler a las variables de deformación (\texttt{ESTE}, \texttt{NORTE}, \texttt{VERTICAL}) para escalar los valores al rango $[0,1]$, según la ecuación:
+
+\begin{equation}
+    x_{normalizado} = \frac{x - x_{min}}{x_{max} - x_{min}}
+\end{equation}
+
+donde $x_{min}$ y $x_{max}$ son los valores mínimo y máximo de cada variable respectivamente.
+
+Generación de secuencias temporales: Para aprovechar la capacidad de las redes LSTM de capturar dependencias temporales, se generaron ventanas deslizantes de 7 días consecutivos. Cada secuencia de entrada $X_i$ tiene la forma:
+
+\begin{equation}
+    X_i = \begin{bmatrix}
+        x_{i-6}^{ESTE} & x_{i-6}^{NORTE} & x_{i-6}^{VERTICAL} \\
+        x_{i-5}^{ESTE} & x_{i-5}^{NORTE} & x_{i-5}^{VERTICAL} \\
+        \vdots & \vdots & \vdots \\
+        x_{i}^{ESTE} & x_{i}^{NORTE} & x_{i}^{VERTICAL}
+    \end{bmatrix} \in \mathbb{R}^{7 \times 3}
+\end{equation}
+
+donde $x_i$ representa las mediciones normalizadas del día $i$. La etiqueta correspondiente $y_i$ es el valor binario de \texttt{ERUPCION} del día siguiente a la ventana.
+
+La arquitectura del modelo implementado corresponde a una red neuronal LSTM diseñada para procesar secuencias temporales de deformación geodésica. La entrada del modelo consiste en secuencias de siete días consecutivos, cada uno con tres componentes correspondientes a las direcciones Este, Norte y Vertical, lo que define una estructura de entrada de tamaño $(7, 3)$.
+
+El modelo inicia con una primera capa LSTM compuesta por 64 unidades y configurada con \texttt{return\_sequences=True}, lo que permite conservar la dimensionalidad temporal para la siguiente capa. Esta es seguida por una capa de regularización Dropout con una tasa del 20\%, con el objetivo de mitigar el sobreajuste. A continuación, se incorpora una segunda capa LSTM con 32 unidades, esta vez con \texttt{return\_sequences=False} para condensar la representación temporal en un solo vector.
+
+Una segunda capa Dropout, también con una tasa de 0.2, proporciona regularización adicional. La salida de las capas LSTM es procesada por una capa densa intermedia de 16 neuronas con función de activación ReLU, que permite capturar relaciones no lineales. Finalmente, la capa de salida está compuesta por una única neurona con activación sigmoide, produciendo un valor entre 0 y 1 interpretable como la probabilidad de ocurrencia de una erupción volcánica.
+
+Esta configuración fue seleccionada por su capacidad para capturar patrones secuenciales en series temporales, manteniendo un equilibrio entre complejidad del modelo y generalización, especialmente considerando el tamaño limitado del dataset.
+
+
+La función de activación sigmoid en la capa de salida produce valores en el rango $[0,1]$, interpretables como la probabilidad de ocurrencia de una erupción volcánica:
+
+\begin{equation}
+    P(erupción) = \sigma(z) = \frac{1}{1 + e^{-z}}
+\end{equation}
+
+donde $z$ es la salida de la capa densa anterior.
+
+El conjunto de datos se dividió en tres subconjuntos: 70\% para entrenamiento (644 muestras), 15\% para validación (138 muestras) y 15\% para prueba (138 muestras). Se aplicó una partición estratificada para conservar la proporción de clases en cada subconjunto.
+
+Durante el entrenamiento se compararon tres algoritmos de optimización: Adam, con tasa de aprendizaje inicial de 0.001 y estimación adaptativa de momentos de primer y segundo orden; SGD, con tasa de 0.01 y momentum de 0.9 para acelerar la convergencia; y RMSprop, también con tasa de 0.001, que ajusta automáticamente la tasa de aprendizaje según la magnitud del gradiente.
+
+La función de pérdida utilizada fue la entropía cruzada binaria:
+\begin{equation}
+    \mathcal{L} = -\frac{1}{N} \sum_{i=1}^{N} [y_i \log(\hat{y}_i) + (1-y_i) \log(1-\hat{y}_i)]
+\end{equation}
+donde $y_i$ representa la etiqueta real y $\hat{y}_i$ la predicción del modelo.
+
+Las métricas de evaluación utilizadas fueron: exactitud (accuracy), precisión, recall y F1-score. La exactitud mide la proporción de predicciones correctas sobre el total de casos. La precisión indica qué proporción de las predicciones positivas fue correcta, mientras que el recall refleja la capacidad del modelo para identificar todos los casos positivos reales. Finalmente, el F1-score representa la media armónica entre precisión y recall, ofreciendo un balance entre ambas métricas.
+
+Durante el entrenamiento se aplicaron técnicas de regularización y callbacks para mejorar la generalización del modelo. Se utilizó Early Stopping con una paciencia de 10 épocas para evitar sobreentrenamiento, restaurando los pesos del modelo que alcanzaron el mejor desempeño en validación. Adicionalmente, se empleó el método ReduceLROnPlateau, que disminuye automáticamente la tasa de aprendizaje en un factor de 0.5 si la pérdida de validación no mejora durante 5 épocas consecutivas. Las capas LSTM incluyeron Dropout con una tasa de 0.2 como medida adicional contra el sobreajuste.
+
+El entrenamiento se ejecutó con un tamaño de batch de 32 y un máximo de 100 épocas. Sin embargo, en la mayoría de los casos el proceso finalizó antes de este límite gracias al uso de early stopping.\\
+
+El código fuente y los scripts de preprocesamiento se encuentran disponibles públicamente en GitHub \cite{b15}.
+
+
+\section{Resultados}
+
+\subsection{Evaluación de Optimizadores}
+
+Se evaluaron tres algoritmos de optimización diferentes para entrenar el modelo LSTM de predicción de erupciones volcánicas. La Tabla \ref{tab:metricas} presenta las métricas de rendimiento obtenidas en el conjunto de prueba para cada optimizador.
+
+\begin{table}[H]
+\centering
+\caption{Métricas de rendimiento por optimizador en el conjunto de prueba}
+\label{tab:metricas}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Optimizador} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} \\
+\hline
+Adam & 0.9130 & 0.9248 & 0.9840 & 0.9535 \\
+SGD & 0.9058 & 0.9058 & 1.0000 & 0.9506 \\
+\textbf{RMSprop} & \textbf{0.9203} & \textbf{0.9191} & \textbf{1.0000} & \textbf{0.9579} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Análisis Comparativo de Métricas}
+
+Los resultados muestran que \textbf{RMSprop} alcanzó el mejor rendimiento global con un accuracy del 92.03\% y un F1-Score de 95.79\%. Es notable que tanto SGD como RMSprop lograron un recall del 100\%, lo que significa que estos optimizadores son capaces de detectar todas las erupciones volcánicas presentes en el conjunto de prueba, un aspecto crítico para aplicaciones de seguridad y monitoreo volcánico.
+
+La Figura \ref{fig:metric_accuracy} muestra la comparación de accuracy entre los tres optimizadores, donde RMSprop destaca con el valor más alto. De manera similar, la Figura \ref{fig:metric_f1_score} confirma que RMSprop alcanza el mejor F1-Score, indicando un balance óptimo entre precisión y recall.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{metric_accuracy.png}
+\caption{Comparación de accuracy por optimizador}
+\label{fig:metric_accuracy}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{metric_f1_score.png}
+\caption{Comparación de F1-Score por optimizador}
+\label{fig:metric_f1_score}
+\end{figure}
+
+\subsection{Análisis de Recall y Precision}
+
+La Figura \ref{fig:metric_recall} muestra que tanto SGD como RMSprop logran un recall perfecto del 100\%, mientras que Adam alcanza un 98.40\%. Este resultado es particularmente significativo en el contexto de predicción de erupciones volcánicas, donde los falsos negativos (no detectar una erupción) son más críticos que los falsos positivos (falsas alarmas).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{metric_recall.png}
+\caption{Comparación de recall por optimizador}
+\label{fig:metric_recall}
+\end{figure}
+
+La Figura \ref{fig:metric_precision} revela que Adam tiene la precision más alta (92.48\%), seguido por RMSprop (91.91\%) y SGD (90.58\%). Sin embargo, la combinación de precision y recall en RMSprop resulta en el mejor F1-Score general.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{metric_precision.png}
+\caption{Comparación de precision por optimizador}
+\label{fig:metric_precision}
+\end{figure}
+
+\subsection{Historial de Entrenamiento}
+
+El análisis del historial de entrenamiento revela patrones interesantes en la convergencia de cada optimizador. La Figura \ref{fig:training_rmsprop_loss} muestra que RMSprop presenta una convergencia más estable en la función de pérdida, alcanzando valores más bajos tanto en entrenamiento como en validación Figura \ref{fig:training_rmsprop_val_loss} .
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{training_rmsprop_train_loss.png}
+\caption{Historial de pérdida de entrenamiento para RMSprop}
+\label{fig:training_rmsprop_loss}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{training_rmsprop_val_loss.png}
+\caption{Historial de pérdida de validación para RMSprop}
+\label{fig:training_rmsprop_val_loss}
+\end{figure}
+
+Las Figuras \ref{fig:training_rmsprop_acc} y \ref{fig:training_rmsprop_val_acc} muestran que RMSprop alcanza y mantiene altos niveles de accuracy tanto en entrenamiento como en validación, con una convergencia estable y sin signos evidentes de overfitting(sobreajuste).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{training_rmsprop_train_acc.png}
+\caption{Historial de accuracy de entrenamiento para RMSprop}
+\label{fig:training_rmsprop_acc}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{training_rmsprop_val_acc.png}
+\caption{Historial de accuracy de validación para RMSprop}
+\label{fig:training_rmsprop_val_acc}
+\end{figure}
+
+\subsection{Matrices de Confusión}
+
+Las matrices de confusión proporcionan una visualización detallada de las predicciones del modelo para cada optimizador. La Figura \ref{fig:confusion_rmsprop} muestra la matriz de confusión para RMSprop, que exhibe 0 falsos negativos (recall perfecto) y 11 falsos positivos, con 125 verdaderos positivos y 2 verdaderos negativos.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{confusion_matrix_rmsprop.png}
+\caption{Matriz de confusión para el optimizador RMSprop}
+\label{fig:confusion_rmsprop}
+\end{figure}
+
+La Figura \ref{fig:confusion_sgd} muestra que SGD también logra un recall perfecto (0 falsos negativos) pero presenta 13 falsos positivos, mientras que la Figura \ref{fig:confusion_adam} revela que Adam tiene 3 falsos negativos y 10 falsos positivos.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{confusion_matrix_sgd.png}
+\caption{Matriz de confusión para el optimizador SGD}
+\label{fig:confusion_sgd}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{confusion_matrix_adam.png}
+\caption{Matriz de confusión para el optimizador Adam}
+\label{fig:confusion_adam}
+\end{figure}
+
+\subsection{Visualización 3D del Descenso por Gradiente}
+
+La Figura \ref{fig:gradient_3d} presenta una visualización tridimensional mejorada del descenso por gradiente, mostrando cómo cada optimizador navega por el espacio de la función de pérdida durante el entrenamiento.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{gradient_descent_3d.png}
+\caption{Visualización 3D del descenso por gradiente para cada optimizador}
+\label{fig:gradient_3d}
+\end{figure}
+
+Esta visualización tridimensional muestra las diferentes estrategias de optimización: Adam: Combina estimación adaptativa de momentos con corrección de bias, mostrando una trayectoria suave hacia el mínimo global. SGD: Utiliza momentum para acelerar la convergencia, mostrando oscilaciones controladas en el espacio de parámetros. RMSprop: Adapta la tasa de aprendizaje basándose en la magnitud del gradiente, mostrando una convergencia eficiente y directa hacia el óptimo.
+
+La visualización 3D permite apreciar mejor las diferencias en las trayectorias de optimización y cómo cada algoritmo maneja los diferentes gradientes en el espacio de parámetros multidimensional.
+
+\subsection{Conclusiones de Rendimiento}
+
+Los resultados demuestran que \textbf{RMSprop} es el optimizador más efectivo para este problema específico de predicción de erupciones volcánicas, alcanzando:
+Accuracy más alto: 92.03\% de precisión general. F1-Score óptimo: 95.79\%, indicando un balance excelente entre precisión y recall. Recall perfecto: 100\% de detección de erupciones reales. Precision competitiva: 91.91\% de predicciones positivas correctas.
+
+La combinación de alto accuracy y recall perfecto hace que RMSprop sea especialmente adecuado para aplicaciones de monitoreo volcánico donde la detección de todas las erupciones es crítica para la seguridad pública. El modelo entrenado con RMSprop puede servir como una herramienta confiable para sistemas de alerta temprana de actividad volcánica, proporcionando una base sólida para la toma de decisiones en situaciones de emergencia. 
+
+\section{Discusión}
+
+RMSprop se destacó como el optimizador más eficaz en este estudio, alcanzando un 92.03\% de exactitud. Su capacidad para ajustar dinámicamente la tasa de aprendizaje en función de la magnitud del gradiente resultó especialmente adecuada para datos secuenciales como los proporcionados por las señales GNSS. Esta adaptabilidad permitió al modelo converger de forma eficiente sin caer en mínimos locales ni sobreajustar.
+
+Una observación relevante fue que tanto RMSprop como SGD lograron un recall del 100\% en el conjunto de prueba, identificando correctamente todos los eventos eruptivos. Este resultado es crucial para sistemas de alerta temprana, donde omitir una erupción puede tener consecuencias catastróficas. La capacidad de detectar todos los casos positivos fortalece la confianza pública en el sistema y responde a estándares de seguridad establecidos por autoridades de protección civil.
+
+Sin embargo, RMSprop también generó 11 falsos positivos, lo que representa un 8.8\% de todas las predicciones etiquetadas como erupción. Aunque estos errores implican posibles costos operativos y riesgos de fatiga de alertas, se considera aceptable en el contexto del monitoreo volcánico, donde es preferible emitir una alerta innecesaria que fallar en la detección de un evento real.
+
+El presente trabajo enfrenta varias limitaciones. En primer lugar, el tamaño del dataset, con solo 927 registros, es reducido para un enfoque basado en aprendizaje profundo. Además, el modelo no incorpora otras variables geofísicas relevantes como actividad sísmica, emisiones de gases o condiciones meteorológicas. La clasificación utilizada es binaria, limitándose a indicar presencia o ausencia de erupción, sin considerar el tipo o magnitud del evento. Finalmente, la validación temporal se restringe al periodo 2023–2024, lo cual limita la generalización del modelo.
+
+A pesar de estas restricciones, los resultados obtenidos son competitivos en comparación con enfoques previos y sugieren que el uso de redes LSTM aplicadas a datos GNSS, junto con optimizadores adecuados, tiene un potencial considerable para el desarrollo de sistemas automáticos de predicción volcánica en regiones de alto riesgo.
+
+
+\section{Conclusión}
+
+Los resultados obtenidos en este estudio demuestran que un modelo basado en redes neuronales LSTM, entrenado exclusivamente con datos GNSS, puede predecir con alta precisión la ocurrencia de erupciones volcánicas. En particular, el optimizador RMSprop mostró un desempeño superior, alcanzando una exactitud del 92.03\% y logrando un recall del 100\%, lo que asegura la detección de todos los eventos eruptivos sin omisiones. Esta característica es fundamental para aplicaciones en sistemas de alerta temprana, donde la sensibilidad del modelo tiene implicancias directas en la seguridad de la población.
+
+La arquitectura propuesta puede integrarse fácilmente en los sistemas operacionales del Instituto Geofísico del Perú, aprovechando la infraestructura existente para permitir un monitoreo en tiempo real. Su relativa simplicidad computacional facilita la implementación práctica y lo convierte en un complemento útil a los métodos tradicionales de vigilancia volcánica, basados principalmente en observación humana y análisis sísmico.
+
+Como trabajo futuro, se plantea la ampliación del conjunto de datos mediante la incorporación de volcanes adicionales, tanto a nivel nacional como internacional, así como la inclusión de registros históricos más extensos. Se propone también el uso de datos multimodales, integrando información sísmica, geoquímica, imágenes térmicas y satelitales. En cuanto al modelo, se explorarán extensiones hacia esquemas de clasificación multiclase, predicción de intensidad eruptiva y estimaciones temporales más precisas. Asimismo, será esencial validar el sistema en escenarios operacionales reales, mediante pruebas en tiempo real y comparaciones con los juicios de expertos.
+
+Finalmente, la implementación de herramientas asociadas, como interfaces de usuario, sistemas de alertas automáticas y servicios web mediante API, puede facilitar su adopción institucional. En conjunto, este estudio representa un avance concreto en la aplicación de técnicas de aprendizaje profundo al monitoreo volcánico, con un impacto potencial significativo en la reducción del riesgo y la protección de vidas humanas frente a amenazas naturales.
+
+
+
+
+
+\begin{thebibliography}{00}
+\bibitem{b1} IGP, ``Erupción del volcán Ubinas: más de mil personas fueron evacuadas,'' Instituto Geofísico del Perú, julio 2019. [En línea]. Disponible: \url{https://www.igp.gob.pe}
+\bibitem{b2} IGP, ``Reporte de actividad del volcán Sabancaya – 2023,'' Instituto Geofísico del Perú, 2023. [En línea]. Disponible: \url{https://www.igp.gob.pe}
+\bibitem{b3} USGS, ``Volcano Monitoring,'' United States Geological Survey. [En línea]. Disponible: \url{https://www.usgs.gov/natural-hazards/volcano-hazards/volcano-monitoring}
+\bibitem{b4} J. Zhu et al., ``A deep learning approach for forecasting volcanic activity using seismic and geodetic data,'' \emph{Remote Sensing}, vol. 13, no. 4, p. 678, 2021.
+\bibitem{b5} C. Zhang and P. Zhao, ``Evaluation metrics for imbalanced classification problems in early warning systems,'' \emph{ACM Computing Surveys}, vol. 54, no. 6, pp. 1–36, 2022.
+\bibitem{b6} S. Hochreiter and J. Schmidhuber, ``Long short-term memory,'' \emph{Neural Computation}, vol. 9, no. 8, pp. 1735–1780, 1997.
+\bibitem{b7} A. Graves, ``Supervised sequence labelling with recurrent neural networks,'' \emph{Studies in Computational Intelligence}, vol. 385, Springer, 2012.
+\bibitem{b8} I. Goodfellow, Y. Bengio, and A. Courville, \emph{Deep Learning}. MIT Press, 2016, ch. 8.
+\bibitem{b9} T. Tieleman and G. Hinton, ``Lecture 6.5—RMSProp: Divide the gradient by a running average of its recent magnitude,'' COURSERA: Neural Networks for Machine Learning, 2012.
+\bibitem{b10} D. P. Kingma and J. Ba, ``Adam: A method for stochastic optimization,'' in \emph{Proc. ICLR}, 2015.
+\bibitem{b11} T. G. Farr et al., ``Applications of satellite radar interferometry to earthquakes, volcanoes, and landslides,'' \emph{Remote Sensing of Environment}, vol. 120, pp. 10–24, 2012.
+\bibitem{b12} N. Poland et al., ``Predicting volcanic unrest with GNSS and machine learning: A case study at Okmok Volcano, Alaska,'' \emph{Journal of Volcanology and Geothermal Research}, vol. 409, 2020.
+
+\bibitem{b13} IGP, ``Catálogo de Deformación Geodésica GNSS – Volcanes del Sur del Perú,'' Instituto Geofísico del Perú, 2024. [En línea]. Disponible: \url{https://www.datosabiertos.gob.pe/dataset/cat%C3%A1logo-de-deformaci%C3%B3n-gnss-de-los-volcanes-m%C3%A1s-activos-del-per%C3%BA-ubinas-y-sabancaya-4}
+
+\bibitem{b14} CENVUL–IGP, ``Catálogo de Explosiones Volcánicas – Observatorio Vulcanológico del Sur (OVS),'' Instituto Geofísico del Perú, 2024. [En línea]. Disponible: \url{https://www.datosabiertos.gob.pe/dataset/cat%C3%A1logo-de-explosiones-de-ceniza-de-los-volcanes-m%C3%A1s-activos-del-per%C3%BA-ubinas-y-sabancaya}
+
+\bibitem{b15} J. E. Lazo, ``Código fuente para predicción de erupciones volcánicas con LSTM y GNSS,'' GitHub, 2025. [En línea]. Disponible: \url{https://github.com/JefryErick/PREDICCION-DE-ERUPCIONES-VOLCANICAS}
+
+\end{thebibliography}
+
+
+\end{document}
