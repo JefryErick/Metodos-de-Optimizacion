@@ -1,0 +1,97 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{geometry}
+\geometry{margin=2cm}
+\title{Optimización con el Multiplicador de Lagrange\\
+\large Método de Lagrange aplicado a un caso realista}
+\author{Jefry Erick Quispe Ramos\\
+Estefany Caceres Tacora}
+\date{\today}
+\begin{document}
+\maketitle
+
+\section*{Introducción}
+Se Resolvera un problema de optimización con una restricción lineal, utilizando el método de los multiplicadores de Lagrange. El objetivo es determinar la cantidad óptima de dos productos que una fábrica debe producir para maximizar su utilidad, considerando una limitación en los recursos.
+
+\section*{Función}
+Una fábrica produce dos productos, A y B. La utilidad total (en miles de soles) está dada por la función:
+\[
+f(x,y) = -x^2 - y^2 + 12x + 16y
+\]
+donde:
+\begin{itemize}
+    \item $x$: cantidad del producto A="polos personalizados"
+    \item $y$: cantidad del producto B="busos escolares"
+\end{itemize}
+Restricción de recursos:
+\[
+x + y = 20
+\]
+
+\subsection*{Método de Lagrange}
+Definimos la función Lagrangiana:
+\[
+\mathcal{L}(x, y, \lambda) = -x^2 - y^2 + 12x + 16y - \lambda(x + y - 20)
+\]
+Derivadas parciales:
+\[
+\frac{\partial \mathcal{L}}{\partial x} = -2x + 12 - \lambda = 0 \tag{1}
+\]
+\[
+\frac{\partial \mathcal{L}}{\partial y} = -2y + 16 - \lambda = 0 \tag{2}
+\]
+\[
+\frac{\partial \mathcal{L}}{\partial \lambda} = x + y - 20 = 0 \tag{3}
+\]
+De (1):
+\[
+\lambda = -2x + 12
+\]
+De (2):
+\[
+\lambda = -2y + 16
+\]
+Igualando las expresiones para $\lambda$:
+\[
+-2x + 12 = -2y + 16
+\]
+\[
+-2x + 2y = 4
+\]
+\[
+-x + y = 2 \tag{4}
+\]
+Usamos la restricción:
+\[
+x + y = 20 \tag{5}
+\]
+Sumamos (4) y (5):
+\[
+(-x + y) + (x + y) = 2 + 20
+\]
+\[
+2y = 22 \Rightarrow y = 11
+\]
+Sustituyendo en (5):
+\[
+x = 20 - 11 = 9
+\]
+
+\subsection*{Resultado}
+\[
+x = 9 \quad\text{y}\quad y = 11
+\]
+
+\subsection*{Utilidad máxima}
+\[
+f(9, 11) = -(9)^2 - (11)^2 + 12(9) + 16(11)
+\]
+\[
+= -81 - 121 + 108 + 176 = 82
+\]
+
+\textbf{Utilidad máxima: } \fbox{82 miles de soles}
+
+\section*{Conclusión}
+Aplicando el método de los multiplicadores de Lagrange, se determinó que la fábrica debe producir 9 unidades del producto A y 11 unidades del producto B para maximizar su utilidad, respetando la restricción de que la suma de ambos productos no exceda los 20. Bajo estas condiciones, la utilidad máxima que se puede obtener es de \textbf{82 mil soles}. Esto significa que, con una adecuada asignación de recursos y tomando en cuenta los rendimientos decrecientes expresados en la función cuadrática, se logra una producción óptima que maximiza las ganancias de la empresa.
+\end{document}

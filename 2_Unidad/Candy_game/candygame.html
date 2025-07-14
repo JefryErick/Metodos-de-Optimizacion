@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍭 Juego de Optimización de Caramelos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tutorial {
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            padding: 25px;
+            margin: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #28a745;
+        }
+
+        .tutorial h3 {
+            color: #155724;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .tutorial-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .tutorial-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .tutorial-section h4 {
+            color: #495057;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tutorial-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tutorial-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tutorial-list li:last-child {
+            border-bottom: none;
+        }
+
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .input-group input {
+            padding: 10px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 16px;
+            width: 80px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 300px;
+            gap: 30px;
+            padding: 30px;
+            min-height: 600px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .panel h3 {
+            margin-bottom: 20px;
+            color: #495057;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .exchange-requirements {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffcc02 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .requirement-text {
+            font-weight: bold;
+            color: #f57f17;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .requirements-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .requirement-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .global-bag {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+        }
+
+        .candy-counter {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            min-width: 80px;
+        }
+
+        .candy-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .candy-count {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .candy-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            text-transform: capitalize;
+        }
+
+        .groups-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .group {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 15px;
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+
+        .group:hover {
+            transform: translateY(-2px);
+        }
+
+        .group-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #1565c0;
+            font-size: 1.1em;
+        }
+
+        .players {
+            display: grid;
+            gap: 10px;
+        }
+
+        .player {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+            border-left: 4px solid #dee2e6;
+        }
+
+        .player.saved {
+            border-left-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .player-id {
+            font-weight: bold;
+            color: #495057;
+            min-width: 80px;
+        }
+
+        .player-candies {
+            display: flex;
+            gap: 8px;
+        }
+
+        .candy {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .candy.limon {
+            background: linear-gradient(135deg, #f7e98e 0%, #eecc5d 100%);
+            color: #333;
+        }
+
+        .candy.pera {
+            background: linear-gradient(135deg, #c3f0ca 0%, #8bc34a 100%);
+        }
+
+        .candy.bola {
+            background: linear-gradient(135deg, #ffcdd2 0%, #f44336 100%);
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-saved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .stats-panel {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 1.1em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        .history {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .history-item {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            border-left: 3px solid #007bff;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .explanation-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #17a2b8;
+            margin: 15px 0;
+        }
+
+        .explanation-box h4 {
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .control-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+
+            .tutorial-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍭 Juego de Optimización de Caramelos</h1>
+            <p>Aprende estrategias de optimización mientras ayudas a todos los jugadores</p>
+        </div>
+
+        <div class="tutorial">
+            <h3>📚 ¿Cómo Funciona Este Juego?</h3>
+            <div class="tutorial-content">
+                <div class="tutorial-section">
+                    <h4>🎯 Objetivo</h4>
+                    <ul class="tutorial-list">
+                        <li>🍭 Conseguir que todos tengan un chupetín</li>
+                        <li>⚡ Usar la menor cantidad de pasos posible</li>
+                        <li>🧠 Aplicar estrategias de optimización</li>
+                    </ul>
+                </div>
+                <div class="tutorial-section">
+                    <h4>📝 Reglas</h4>
+                    <ul class="tutorial-list">
+                        <li>🍋 Cada jugador inicia con 2 caramelos aleatorios</li>
+                        <li>🔄 Para un chupetín necesitas: 2🍋 + 2🍐 + 2🔴</li>
+                        <li>➕ Al conseguir chupetín, recibes 2 caramelos nuevos</li>
+                    </ul>
+                </div>
+                <div class="tutorial-section">
+                    <h4>🧮 Estrategia</h4>
+                    <ul class="tutorial-list">
+                        <li>🎱 Pooling: Combina todos los caramelos</li>
+                        <li>📊 Balance: Mantén equilibrio entre tipos</li>
+                        <li>🎯 Optimiza la selección de nuevos caramelos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <div class="input-group">
+                    <label for="numPlayers">👥 Número de jugadores (múltiplo de 3):</label>
+                    <input type="number" id="numPlayers" min="3" step="3" value="6">
+                </div>
+                <button class="btn btn-primary" onclick="startGame()">🎮 Iniciar Juego</button>
+                <button class="btn btn-secondary" onclick="optimizeStep()" id="optimizeBtn" disabled>⚡ Optimizar Paso</button>
+                <button class="btn btn-success" onclick="showOptimalSolution()" id="solutionBtn" disabled>💡 Ver Estrategia</button>
+                <button class="btn btn-info" onclick="showTutorial()" id="tutorialBtn">❓ Tutorial</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h3>🎯 Estado del Juego</h3>
+                
+                <div class="exchange-requirements">
+                    <div class="requirement-text">🍭 Receta para 1 chupetín:</div>
+                    <div class="requirements-grid">
+                        <div class="requirement-item">
+                            <span style="font-size: 1.5em;">🍋</span>
+                            <span>2 Limón</span>
+                        </div>
+                        <div class="requirement-item">
+                            <span style="font-size: 1.5em;">🍐</span>
+                            <span>2 Pera</span>
+                        </div>
+                        <div class="requirement-item">
+                            <span style="font-size: 1.5em;">🔴</span>
+                            <span>2 Bola</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="global-bag">
+                    <div class="candy-counter">
+                        <div class="candy-icon">🍋</div>
+                        <div class="candy-count" id="limonCount">0</div>
+                        <div class="candy-label">Limón</div>
+                    </div>
+                    <div class="candy-counter">
+                        <div class="candy-icon">🍐</div>
+                        <div class="candy-count" id="peraCount">0</div>
+                        <div class="candy-label">Pera</div>
+                    </div>
+                    <div class="candy-counter">
+                        <div class="candy-icon">🔴</div>
+                        <div class="candy-count" id="bolaCount">0</div>
+                        <div class="candy-label">Bola</div>
+                    </div>
+                </div>
+
+                <div id="gameStatus"></div>
+            </div>
+
+            <div class="panel">
+                <h3>👥 Grupos de Jugadores</h3>
+                <div class="groups-container" id="groupsContainer">
+                    <div class="explanation-box">
+                        <h4>💡 Concepto Clave: Pooling</h4>
+                        <p>En vez de que cada grupo trabaje por separado, <strong>combinamos todos los caramelos</strong> para maximizar las posibilidades de intercambio. Esto es una estrategia de optimización llamada "pooling" o agrupación de recursos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel stats-panel">
+                <h3>📊 Estadísticas</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Total Jugadores:</span>
+                    <span class="stat-value" id="totalPlayers">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Jugadores Salvados:</span>
+                    <span class="stat-value" id="savedPlayers">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Progreso:</span>
+                    <span class="stat-value"><span id="progressPercent">0</span>%</span>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+
+                <div class="stat-item">
+                    <span class="stat-label">Canjes Posibles:</span>
+                    <span class="stat-value" id="possibleExchanges">0</span>
+                </div>
+
+                <div class="explanation-box">
+                    <h4>🔢 ¿Cómo calculamos los canjes?</h4>
+                    <p>Canjes posibles = min(🍋÷2, 🍐÷2, 🔴÷2)<br>
+                    Necesitamos al menos 2 de cada tipo para hacer 1 chupetín.</p>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #495057;">📝 Historial</h4>
+                <div class="history" id="historyContainer">
+                    <!-- El historial se generará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para tutorial -->
+    <div id="tutorialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📚 Tutorial Completo</h2>
+                <span class="close" onclick="closeTutorialModal()">&times;</span>
+            </div>
+            <div id="tutorialContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal para solución óptima -->
+    <div id="solutionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💡 Estrategia de Optimización</h2>
+                <span class="close" onclick="closeSolutionModal()">&times;</span>
+            </div>
+            <div id="solutionContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Constantes del juego con explicación
+        const CANDY_TYPES = ['limon', 'pera', 'bola']; // Los 3 tipos de caramelos
+        const CANDIES_PER_PLAYER = 2; // Cada jugador inicia con 2 caramelos
+        const PLAYERS_PER_GROUP = 3; // Grupos de 3 jugadores (requisito del problema)
+        const LOLLIPOP_REQUIREMENT = { limon: 2, pera: 2, bola: 2 }; // Receta del chupetín
+        const CANDY_EMOJIS = { limon: '🍋', pera: '🍐', bola: '🔴' };
+
+        // Estado del juego
+        let players = [];
+        let groups = [];
+        let globalBag = { limon: 0, pera: 0, bola: 0 };
+        let history = [];
+
+        class Player {
+            constructor(id) {
+                this.id = id;
+                this.candies = [];
+                this.saved = false;
+                this.lollipops = 0;
+                
+                // Generar caramelos aleatorios para simular distribución inicial
+                for (let i = 0; i < CANDIES_PER_PLAYER; i++) {
+                    const randomCandy = CANDY_TYPES[Math.floor(Math.random() * CANDY_TYPES.length)];
+                    this.candies.push(randomCandy);
+                }
+            }
+        }
+
+        class Group {
+            constructor(players) {
+                this.players = players;
+                this.lollipops = 0;
+            }
+
+            getTotalCandies() {
+                const counter = { limon: 0, pera: 0, bola: 0 };
+                this.players.forEach(player => {
+                    player.candies.forEach(candy => {
+                        counter[candy]++;
+                    });
+                });
+                return counter;
+            }
+        }
+
+        function startGame() {
+            const numPlayers = parseInt(document.getElementById('numPlayers').value);
+            
+            if (!numPlayers || numPlayers % 3 !== 0 || numPlayers < 3) {
+                showAlert('⚠️ Número inválido. Debe ser múltiplo de 3 (ej: 3, 6, 9, 12...)', 'warning');
+                return;
+            }
+
+            // Inicializar jugadores
+            players = [];
+            for (let i = 0; i < numPlayers; i++) {
+                players.push(new Player(i + 1));
+            }
+
+            // Crear grupos (concepto de organización)
+            groups = [];
+            for (let i = 0; i < numPlayers; i += 3) {
+                groups.push(new Group(players.slice(i, i + 3)));
+            }
+
+            // Calcular bolsa global (implementación del pooling)
+            globalBag = { limon: 0, pera: 0, bola: 0 };
+            players.forEach(player => {
+                player.candies.forEach(candy => {
+                    globalBag[candy]++;
+                });
+            });
+
+            history = [];
+            
+            // Habilitar botones
+            document.getElementById('optimizeBtn').disabled = false;
+            document.getElementById('solutionBtn').disabled = false;
+
+            updateDisplay();
+            showAlert(`🎮 Juego iniciado! ${numPlayers} jugadores, ${groups.length} grupos. Bolsa global: ${globalBag.limon}🍋 ${globalBag.pera}🍐 ${globalBag.bola}🔴`, 'success');
+            addToHistory(`🎮 Juego iniciado con ${numPlayers} jugadores (${groups.length} grupos)`);
+        }
+
+        function updateDisplay() {
+            updateGlobalBag();
+            updateGroups();
+            updateStats();
+        }
+
+        function updateGlobalBag() {
+            document.getElementById('limonCount').textContent = globalBag.limon;
+            document.getElementById('peraCount').textContent = globalBag.pera;
+            document.getElementById('bolaCount').textContent = globalBag.bola;
+        }
+
+        function updateGroups() {
+            const container = document.getElementById('groupsContainer');
+            container.innerHTML = '';
+
+            groups.forEach((group, groupIndex) => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'group';
+                
+                const groupTitle = document.createElement('div');
+                groupTitle.className = 'group-title';
+                groupTitle.textContent = `Grupo ${groupIndex + 1}`;
+                groupDiv.appendChild(groupTitle);
+
+                const playersDiv = document.createElement('div');
+                playersDiv.className = 'players';
+
+                group.players.forEach(player => {
+                    const playerDiv = document.createElement('div');
+                    playerDiv.className = `player ${player.saved ? 'saved' : ''}`;
+
+                    const playerInfo = document.createElement('div');
+                    playerInfo.className = 'player-info';
+
+                    const playerId = document.createElement('div');
+                    playerId.className = 'player-id';
+                    playerId.textContent = `Jugador ${player.id}`;
+                    playerInfo.appendChild(playerId);
+
+                    const candiesDiv = document.createElement('div');
+                    candiesDiv.className = 'player-candies';
+                    
+                    player.candies.forEach(candy => {
+                        const candyDiv = document.createElement('div');
+                        candyDiv.className = `candy ${candy}`;
+                        candyDiv.textContent = CANDY_EMOJIS[candy];
+                        candiesDiv.appendChild(candyDiv);
+                    });
+                    
+                    playerInfo.appendChild(candiesDiv);
+                    playerDiv.appendChild(playerInfo);
+
+                    if (player.saved) {
+                        const badge = document.createElement('div');
+                        badge.className = 'status-badge status-saved';
+                        badge.textContent = '✅ Salvado';
+                        playerDiv.appendChild(badge);
+                    }
+
+                    playersDiv.appendChild(playerDiv);
+                });
+
+                groupDiv.appendChild(playersDiv);
+                container.appendChild(groupDiv);
+            });
+        }
+
+        function updateStats() {
+            const totalPlayers = players.length;
+            const savedPlayers = players.filter(p => p.saved).length;
+            const progress = totalPlayers > 0 ? Math.round((savedPlayers / totalPlayers) * 100) : 0;
+            const possibleExchanges = canExchange() ? Math.floor(Math.min(
+                globalBag.limon / LOLLIPOP_REQUIREMENT.limon,
+                globalBag.pera / LOLLIPOP_REQUIREMENT.pera,
+                globalBag.bola / LOLLIPOP_REQUIREMENT.bola
+            )) : 0;
+
+            document.getElementById('totalPlayers').textContent = totalPlayers;
+            document.getElementById('savedPlayers').textContent = savedPlayers;
+            document.getElementById('progressPercent').textContent = progress;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('possibleExchanges').textContent = possibleExchanges;
+        }
+
+        function canExchange() {
+            // Verificar si tenemos suficientes caramelos para hacer al menos un chupetín
+            return globalBag.limon >= LOLLIPOP_REQUIREMENT.limon &&
+                   globalBag.pera >= LOLLIPOP_REQUIREMENT.pera &&
+                   globalBag.bola >= LOLLIPOP_REQUIREMENT.bola;
+        }
+
+        function optimizeStep() {
+            if (!canExchange()) {
+                showAlert('❌ No hay suficientes caramelos para hacer intercambios', 'warning');
+                return;
+            }
+
+            // Calcular cuántos chupetines podemos hacer
+            const maxExchanges = Math.floor(Math.min(
+                globalBag.limon / LOLLIPOP_REQUIREMENT.limon,
+                globalBag.pera / LOLLIPOP_REQUIREMENT.pera,
+                globalBag.bola / LOLLIPOP_REQUIREMENT.bola
+            ));
+
+            // Hacer intercambios óptimos
+            const exchangesToMake = Math.min(maxExchanges, players.filter(p => !p.saved).length);
+            
+            for (let i = 0; i < exchangesToMake; i++) {
+                // Quitar caramelos necesarios de la bolsa global
+                globalBag.limon -= LOLLIPOP_REQUIREMENT.limon;
+                globalBag.pera -= LOLLIPOP_REQUIREMENT.pera;
+                globalBag.bola -= LOLLIPOP_REQUIREMENT.bola;
+
+                // Encontrar un jugador no salvado
+                const unsavedPlayer = players.find(p => !p.saved);
+                if (unsavedPlayer) {
+                    unsavedPlayer.saved = true;
+                    unsavedPlayer.lollipops++;
+                    
+                    // Agregar 2 caramelos nuevos (optimización: elegir los que más necesitamos)
+                    const newCandies = chooseOptimalCandies();
+                    unsavedPlayer.candies = newCandies;
+                    
+                    // Agregar a la bolsa global
+                    newCandies.forEach(candy => {
+                        globalBag[candy]++;
+                    });
+                }
+            }
+
+            updateDisplay();
+            addToHistory(`⚡ Optimización: ${exchangesToMake} jugadores salvados`);
+            
+            if (players.every(p => p.saved)) {
+                showAlert('🎉 ¡Felicidades! Todos los jugadores han sido salvados!', 'success');
+                document.getElementById('optimizeBtn').disabled = true;
+            } else {
+                showAlert(`✅ ${exchangesToMake} jugadores salvados en este paso`, 'success');
+            }
+        }
+
+        function chooseOptimalCandies() {
+            // Estrategia: elegir los caramelos que más necesitamos para balancear
+            const counts = [globalBag.limon, globalBag.pera, globalBag.bola];
+            const types = ['limon', 'pera', 'bola'];
+            
+            // Ordenar por cantidad (ascendente) para priorizar los que menos tenemos
+            const sorted = types.map((type, index) => ({ type, count: counts[index] }))
+                              .sort((a, b) => a.count - b.count);
+            
+            // Elegir los 2 tipos que menos tenemos
+            return [sorted[0].type, sorted[1].type];
+        }
+
+        function showOptimalSolution() {
+            const modal = document.getElementById('solutionModal');
+            const content = document.getElementById('solutionContent');
+            
+            const totalPlayers = players.length;
+            const savedPlayers = players.filter(p => p.saved).length;
+            const remaining = totalPlayers - savedPlayers;
+            
+            // Calcular pasos óptimos
+            const currentExchanges = canExchange() ? Math.floor(Math.min(
+                globalBag.limon / LOLLIPOP_REQUIREMENT.limon,
+                globalBag.pera / LOLLIPOP_REQUIREMENT.pera,
+                globalBag.bola / LOLLIPOP_REQUIREMENT.bola
+            )) : 0;
+
+            content.innerHTML = `
+                <div class="explanation-box">
+                    <h4>🧮 Análisis de la Situación Actual</h4>
+                    <p><strong>Jugadores restantes:</strong> ${remaining}</p>
+                    <p><strong>Caramelos disponibles:</strong> ${globalBag.limon}🍋 ${globalBag.pera}🍐 ${globalBag.bola}🔴</p>
+                    <p><strong>Intercambios posibles ahora:</strong> ${currentExchanges}</p>
+                </div>
+
+                <div class="explanation-box">
+                    <h4>🎯 Estrategia de Pooling</h4>
+                    <p>La estrategia óptima es el <strong>"Pooling"</strong> o agrupación de recursos:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>✅ Combinar todos los caramelos en una bolsa global</li>
+                        <li>✅ Maximizar los intercambios posibles</li>
+                        <li>✅ Elegir nuevos caramelos basándose en el balance</li>
+                        <li>✅ Repetir hasta salvar a todos</li>
+                    </ul>
+                </div>
+
+                <div class="explanation-box">
+                    <h4>🔢 Fórmula de Optimización</h4>
+                    <p><strong>Intercambios por ronda =</strong> min(🍋÷2, 🍐÷2, 🔴÷2)</p>
+                    <p><strong>Nuevos caramelos =</strong> 2 × intercambios (elegir inteligentemente)</p>
+                    <p><strong>Criterio de selección:</strong> Priorizar los tipos con menor cantidad</p>
+                </div>
+
+                <div class="explanation-box">
+                    <h4>📊 Simulación de Pasos</h4>
+                    <div id="simulationSteps"></div>
+                </div>
+            `;
+
+            // Simular pasos futuros
+            simulateOptimalSteps();
+            modal.style.display = 'block';
+        }
+
+        function simulateOptimalSteps() {
+            const container = document.getElementById('simulationSteps');
+            if (!container) return;
+
+            // Crear copia del estado actual
+            let tempBag = { ...globalBag };
+            let tempRemaining = players.filter(p => !p.saved).length;
+            let step = 1;
+            let stepsHtml = '';
+
+            while (tempRemaining > 0 && step <= 10) { // Limitar a 10 pasos para evitar bucles infinitos
+                const exchanges = Math.floor(Math.min(
+                    tempBag.limon / 2,
+                    tempBag.pera / 2,
+                    tempBag.bola / 2
+                ));
+
+                if (exchanges === 0) {
+                    stepsHtml += `<p><strong>Paso ${step}:</strong> ❌ No hay suficientes caramelos para continuar</p>`;
+                    break;
+                }
+
+                const actualExchanges = Math.min(exchanges, tempRemaining);
+                
+                // Simular intercambios
+                tempBag.limon -= actualExchanges * 2;
+                tempBag.pera -= actualExchanges * 2;
+                tempBag.bola -= actualExchanges * 2;
+                tempRemaining -= actualExchanges;
+
+                // Simular nuevos caramelos (estrategia balanceada)
+                const newCandies = actualExchanges * 2;
+                const distribution = distributeNewCandies(tempBag, newCandies);
+                tempBag.limon += distribution.limon;
+                tempBag.pera += distribution.pera;
+                tempBag.bola += distribution.bola;
+
+                stepsHtml += `
+                    <p><strong>Paso ${step}:</strong> ${actualExchanges} intercambios → ${tempRemaining} restantes</p>
+                    <p style="margin-left: 20px; font-size: 0.9em; color: #666;">
+                        Nueva bolsa: ${tempBag.limon}🍋 ${tempBag.pera}🍐 ${tempBag.bola}🔴
+                    </p>
+                `;
+                
+                step++;
+            }
+
+            if (tempRemaining === 0) {
+                stepsHtml += `<p style="color: #28a745; font-weight: bold;">🎉 ¡Todos salvados en ${step - 1} pasos!</p>`;
+            }
+
+            container.innerHTML = stepsHtml;
+        }
+
+        function distributeNewCandies(currentBag, totalNew) {
+            // Estrategia: distribuir para balancear la bolsa
+            const counts = [currentBag.limon, currentBag.pera, currentBag.bola];
+            const result = { limon: 0, pera: 0, bola: 0 };
+            
+            // Distribuir equitativamente, priorizando los tipos con menos cantidad
+            for (let i = 0; i < totalNew; i++) {
+                const currentCounts = [
+                    currentBag.limon + result.limon,
+                    currentBag.pera + result.pera,
+                    currentBag.bola + result.bola
+                ];
+                
+                const minIndex = currentCounts.indexOf(Math.min(...currentCounts));
+                const types = ['limon', 'pera', 'bola'];
+                result[types[minIndex]]++;
+            }
+            
+            return result;
+        }
+
+        function showTutorial() {
+            const modal = document.getElementById('tutorialModal');
+            const content = document.getElementById('tutorialContent');
+            
+            content.innerHTML = `
+                <div class="explanation-box">
+                    <h4>🎮 Bienvenido al Juego de Optimización de Caramelos</h4>
+                    <p>Este juego te enseña conceptos importantes de <strong>investigación de operaciones</strong> y <strong>optimización</strong> de una manera divertida e interactiva.</p>
+                </div>
+
+                <div class="explanation-box">
+                    <h4>📚 Conceptos que Aprenderás</h4>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Pooling:</strong> Combinar recursos para maximizar eficiencia</li>
+                        <li><strong>Optimización:</strong> Encontrar la mejor solución con recursos limitados</li>
+                        <li><strong>Balance de recursos:</strong> Mantener equilibrio entre diferentes tipos</li>
+                        <li><strong>Programación lineal:</strong> Maximizar intercambios sujeto a restricciones</li>
+                    </ul>
+                </div>
+
+                <div class="explanation-box">
+                    <h4>🎯 Mecánica del Juego</h4>
+                    <p><strong>Situación inicial:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Cada jugador tiene 2 caramelos aleatorios</li>
+                        <li>Los jugadores se organizan en grupos de 3</li>
+                        <li>Objetivo: Conseguir que todos tengan un chupetín</li>
+                    </ul>
+                    
+                    <p><strong>Reglas de intercambio:</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>1 chupetín = 2🍋 + 2🍐 + 2🔴</li>
+                        <li>Al conseguir chupetín, el jugador recibe 2 caramelos nuevos</li>
+                        <li>Estos caramelos se agregan a la bolsa global</li>
+                    </ul>
+                </div>
+
+                <div class="explanation-box">
+                    <h4>🧠 Estrategia Óptima</h4>
+                    <p>La clave es el <strong>Pooling</strong>:</p>
+                    <ol style="margin-left: 20px;">
+                        <li>Combinar todos los caramelos en una bolsa global</li>
+                        <li>Calcular cuántos intercambios son posibles</li>
+                        <li>Realizar intercambios hasta agotar posibilidades</li>
+                        <li>Elegir inteligentemente los nuevos caramelos</li>
+                        <li>Repetir hasta salvar a todos</li>
+                    </ol>
+                </div>
+
+                <div class="explanation-box">
+                    <h4>🔄 Ciclo de Optimización</h4>
+                    <p>Cada ronda sigue este patrón:</p>
+                    <p><strong>Evaluar → Intercambiar → Rebalancear → Repetir</strong></p>
+                    <p>Este es un ejemplo clásico de <strong>algoritmo greedy</strong> donde tomamos la mejor decisión disponible en cada paso.</p>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function closeTutorialModal() {
+            document.getElementById('tutorialModal').style.display = 'none';
+        }
+
+        function closeSolutionModal() {
+            document.getElementById('solutionModal').style.display = 'none';
+        }
+
+        function addToHistory(message) {
+            history.push({
+                message: message,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            const container = document.getElementById('historyContainer');
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>${message}</span>
+                    <small style="color: #6c757d;">${history[history.length - 1].timestamp}</small>
+                </div>
+            `;
+            
+            container.appendChild(historyItem);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showAlert(message, type) {
+            // Remover alertas existentes
+            const existingAlerts = document.querySelectorAll('.alert');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            const container = document.querySelector('.main-content');
+            container.insertBefore(alert, container.firstChild);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+
+        // Event listeners para cerrar modales al hacer clic fuera
+        window.onclick = function(event) {
+            const tutorialModal = document.getElementById('tutorialModal');
+            const solutionModal = document.getElementById('solutionModal');
+            
+            if (event.target === tutorialModal) {
+                tutorialModal.style.display = 'none';
+            }
+            if (event.target === solutionModal) {
+                solutionModal.style.display = 'none';
+            }
+        }
+
+        // Inicializar interfaz
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDisplay();
+            addToHistory('🚀 Sistema iniciado - Listo para comenzar');
+        });
+    </script>
+</body>
+</html>

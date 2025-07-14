@@ -1,0 +1,145 @@
+\documentclass{beamer}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+
+\title{Optimización de Portafolio de Inversión}
+\subtitle{Solución para OptimaBattle Arena}
+\author{Equipo de Optimización}
+\date{\today}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Introducción}
+\begin{itemize}
+\item Implementación de un optimizador de portafolio para el torneo OptimaBattle
+\item Objetivo: Maximizar retorno ajustado al riesgo bajo restricciones específicas
+\item Método: Programación convexa con variables enteras (MIQP)
+\item Lenguaje: Python con librerías especializadas (CVXPY, Pandas, NumPy)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Método de Optimización}
+\begin{block}{Problema de Optimización Mixta-Entera}
+\begin{itemize}
+\item \textbf{Tipo}: Programación Cuadrática Entera Mixta (MIQP)
+\item \textbf{Solver}: ECOS\_BB (Branch-and-Bound para problemas convexos)
+\item \textbf{Variables}:
+\begin{itemize}
+\item $w_i$: Variables continuas (pesos del portafolio)
+\item $y_i$: Variables binarias (selección de activos)
+\end{itemize}
+\end{itemize}
+\end{block}
+
+\begin{equation*}
+\text{Maximizar } U = \sum_{i=1}^n r_i w_i - \lambda \sum_{i=1}^n \sigma_i^2 w_i^2
+\end{equation*}
+\end{frame}
+
+\begin{frame}
+\frametitle{Restricciones Implementadas}
+\begin{table}[]
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Restricción} & \textbf{Implementación} \\
+\midrule
+Presupuesto total & $\sum w_i = 1$ \\
+No ventas en corto & $w_i \geq 0$ \\
+Diversificación sectorial & $\sum_{i \in S_j} w_i \leq 0.3$ \\
+Mínimo de activos & $\sum y_i \geq 5$ \\
+Límite de riesgo sistemático & $\sum \beta_i w_i \leq 1.2$ \\
+Inversión mínima por activo & $w_i \cdot B \geq m_i \cdot y_i$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}
+\frametitle{Flujo de Solución}
+\begin{enumerate}
+\item \textbf{Verificación de datos}: Chequeo de archivo y validación de rangos
+\item \textbf{Preparación de parámetros}: Normalización de retornos y volatilidades
+\item \textbf{Formulación del problema}: Construcción de función objetivo y restricciones
+\item \textbf{Solución}: Uso de solver ECOS\_BB
+\item \textbf{Post-procesamiento}: Ajuste a números enteros de acciones
+\item \textbf{Cálculo de métricas}: Retorno, riesgo, beta y puntaje
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Resultados Obtenidos}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\begin{block}{Métricas Clave}
+\begin{itemize}
+\item Retorno esperado: 12.86\%
+\item Volatilidad: 88.45\%
+\item Beta: 1.20
+\item Puntaje: -376.35
+\item Activos seleccionados: 29
+\end{itemize}
+\end{block}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{block}{Distribución Sectorial}
+\begin{itemize}
+\item Sector 1: 29.9\%
+\item Sector 2: 4.3\%
+\item Sector 3: 30.0\%
+\item Sector 4: 5.7\%
+\item Sector 5: 30.0\%
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Análisis de Resultados}
+\begin{itemize}
+\item \textbf{Cumplimiento de restricciones}:
+\begin{itemize}
+\item Todas las restricciones fueron satisfechas (beta exactamente en 1.2)
+\item Distribución sectorial cerca del límite máximo (30\%)
+\end{itemize}
+\item \textbf{Problemas identificados}:
+\begin{itemize}
+\item Puntaje negativo debido a alta volatilidad
+\item Posible sobre-diversificación (29 activos)
+\end{itemize}
+\item \textbf{Mejoras potenciales}:
+\begin{itemize}
+\item Ajustar parámetro de aversión al riesgo ($\lambda$)
+\item Considerar liquidez en la función objetivo
+\item Limitar número máximo de activos
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Conclusiones}
+\begin{itemize}
+\item Implementación exitosa del modelo de optimización
+\item Solución cumple con todas las restricciones del problema
+\item Alta volatilidad sugiere necesidad de ajustar parámetros
+\item El enfoque MIQP permite manejar restricciones complejas
+\item Código estructurado y modular facilita modificaciones
+\end{itemize}
+
+\begin{block}{Próximos pasos}
+\begin{itemize}
+\item Pruebas con diferentes parámetros de aversión al riesgo
+\item Incorporar restricción de liquidez mínima
+\item Optimizar tiempo de ejecución para competencia
+\end{itemize}
+\end{block}
+\end{frame}
+
+\end{document}
